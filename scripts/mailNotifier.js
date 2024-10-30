@@ -39,3 +39,5 @@ const startRandomNotifications = () => {
 
 // Start the process
 startRandomNotifications();
+
+// module.exports = {getRandomInterval};
