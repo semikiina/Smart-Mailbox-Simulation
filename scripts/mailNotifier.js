@@ -2,14 +2,15 @@ const axios = require('axios');
 
 const apiUrl = 'https://localhost:1080';  // TODO: Change this to the correct API URL
 
-const mailNotification = {
-  message: "A new mail has arrived in the mailbox!"
-};
+
 
 // Send a request to the API
 const sendMailNotification = async () => {
   try {
-    const response = await axios.post(apiUrl, mailNotification);
+    const response = await axios.post(apiUrl, {
+      weight: getRandomWeight(),
+      date : new Date().toISOString()
+    });
     console.log('Notification sent: ', response.data);
   } catch (error) {
     console.error('Error sending notification:', error.message);
@@ -20,6 +21,13 @@ const sendMailNotification = async () => {
 const getRandomInterval = () => {
   const min = 1 * 60 * 1000; 
   const max = 5 * 60 * 1000; 
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+// Generate random weight between 70 and 350 grams
+const getRandomWeight = () => {
+  const min = 70;
+  const max = 350;
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
