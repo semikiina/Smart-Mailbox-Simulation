@@ -2,9 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const sequelize = require('./config/database');
-const mainRoute = require('./routes/index');
-
+const connectDatabase = require('./config/dbconfig');
 const app = express();
 
 // Set EJS as the view engine
@@ -15,12 +13,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.use('/', mainRoute);
 
-// Database connection and server start
-sequelize.sync().then(() => {
-  app.listen(1080, () => {
-    console.log('Server is running on http://localhost:1080');
-  });
-}).catch(err => console.error('Unable to connect to the database:', err));
+app.listen(1080, () => {
+  connectDatabase().catch(console.error); 
+  console.log('Server is running on http://localhost:1080');
+});
