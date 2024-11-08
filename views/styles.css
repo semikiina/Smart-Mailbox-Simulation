@@ -1,0 +1,164 @@
+/* Allgemeine Layout-Einstellungen */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Seitenhintergrund und zentrale Ausrichtung */
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+/* Container */
+.container {
+    width: 300px;
+    color: #666;
+}
+
+/* Navbar oben (horizontal) */
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f9f9f9;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    z-index: 1000;
+}
+
+/* Nav-Elemente horizontal anordnen */
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.navbar li {
+    margin: 0 30px; /* Erhöht den Abstand zwischen den Links */
+}
+
+.navbar a {
+    color: #666;
+    text-decoration: none;
+    font-size: 1em;
+    transition: color 0.3s ease;
+}
+
+/* Hover-Effekt für Links */
+.navbar a:hover {
+    color: #f39c12;
+}
+
+/* Zusätzliche Styling-Elemente für Icons */
+.nav-item img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+/* Abstand für den letzten Nav-Item */
+.navbar li:last-child {
+    margin-right: 0;
+}
+/*Mailbox*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    width: 300px;
+    color: #666;
+}
+
+h1, h2 {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.mailbox {
+    width: 40px;
+    height: 100px;
+    border: 2px solid #666;
+    border-radius: 5px;
+    margin-right: 20px;
+    position: relative;
+}
+
+.fill-level {
+    width: 100%;
+    height: 24%;
+    background-color: #ccc;
+    position: absolute;
+    bottom: 0;
+    border-radius: 0 0 3px 3px;
+}
+
+.info p {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.info .total-weight,
+.info .days-not-emptied,
+.info .percentage {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.mail-list {
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.mail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.9em;
+    border-bottom: 1px solid #eee;
+}
+
+.mail-item:last-child {
+    border-bottom: none;
+}
+
+.date {
+    color: #555;
+}
+
+.weight {
+    color: #333;
+    font-weight: bold;
+}
