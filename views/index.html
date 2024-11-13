@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mailbox Status</title>
+    <title>Mailbox</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="navbar">
     <ul>
       <li class="nav-item">
-        <a href="#home"><span>Home</span></a>
+        <a href="index.html"><span>Home</span></a>
       </li>
       <li class="nav-item">
         <a href="notification.html"><span>Notifications</span></a>
@@ -20,38 +20,43 @@
       </li>
     </ul>
   </div>
-
-  <div class="container", id="Home">
-    <h1>My Mailbox</h1>
-    <div class="status">
-      <div class="mailbox">
-        <div class="fill-level"></div>
-        <div class="fill" id="fill"></div>
+    <div class="container">
+        <h1>My Mailbox</h1>
+        <div class="status">
+            <div class="mailbox">
+                <div class="fill-level"></div>
+            </div>
+            <div class="info">
+                <p class="total-weight">221g</p>
+                <p class="days-not-emptied">5 days not emptied</p>
+                <p class="percentage">24% full</p>
+            </div>
+        </div>
+        <h2>Latest Notifications</h2>
+        <div class="mail-list">
+          <div class="mail-item">
+            <span class="new-mail">New Mail Arrived</span>
+              <span class="date">16.09.2024 - 11:44</span>
+              <span class="weight">10g</span>
+          </div>
+          <div class="mail-item">
+              <span class="date">14.09.2024 - 16:23</span>
+              <span class="weight">82g</span>
+          </div>
+          <div class="mail-item">
+              <span class="date">14.09.2024 - 09:53</span>
+              <p>New Mail arrived</p>
+              <span class="weight">5g</span>
+          </div>
+          <div class="mail-item">
+              <span class="new-mail">New Mail Arrived</span>
+              <span class="date">12.09.2024 - 10:02</span>
+              <span class="weight">124g</span>
+          </div>
       </div>
-      <div class="info">
-        <p><span class="total-weight">221g</span> In total</p>
-        <p><span class="days-not-emptied">5 days</span> not emptied</p>
-        <p><span class="percentage">24%</span> full</p>
-      </div>
+        <button onclick="emptyMailbox()">Empty Mailbox</button>
     </div>
 
-    <h2>Latest mails</h2> 
-    <div class="mail-list">
-      <div class="mail-item">
-        <span class="date">16.09.2024 - 11:44</span><span class="weight">10g</span>
-      </div>
-      <div class="mail-item">
-        <span class="date">14.09.2024 - 16:23</span><span class="weight">82g</span>
-      </div>
-      <div class="mail-item">
-        <span class="date">14.09.2024 - 09:53</span><span class="weight">05g</span>
-      </div>
-      <div class="mail-item">
-        <span class="date">12.09.2024 - 10:02</span><span class="weight">124g</span>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <script src="scriptFrontend.js"></script>
 </body>
 </html>
