@@ -11,6 +11,7 @@ document.querySelector('.percentage').textContent = `${percentageFull}%`;
 const fillLevelElement = document.querySelector('.fill-level');
 fillLevelElement.style.height = `${percentageFull}%`;
 
+
 // Beispiel: Klick-Event-Listener für die Navigationselemente
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
