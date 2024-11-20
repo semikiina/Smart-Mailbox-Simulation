@@ -1,26 +1,5 @@
-/*
-const Mail = require('../models/Mail');
-
-exports.getAllMail = async (req, res) => {
-
-    const userId = req.user.id; // Get the user ID from the request object
-
-  try {
-    const mails = await Mail.findAll();
-    res.render('mails', { mails });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server Error');
-  }
-};
-*/
-
-// Import MQTT library
 const mqtt = require('mqtt');
-
-// MQTT Broker configuration
-const brokerUrl = 'mqtt://localhost'; // Example URL, adjust for your broker
-const topic = 'mailbox/weight'; // Topic for weight data from the scale
+const debug = require('debug')('mqtt-mailbox');
 
 // Constants for mail weight and max mailbox weight
 const MAIL_WEIGHT = 15; // Weight of a single mail item in grams
@@ -31,66 +10,83 @@ let currentWeight = 0;
 let mailCount = 0;
 let isMailboxFull = false;
 
-// Initialize and connect MQTT client
+// MQTT Broker configuration
+const brokerUrl = 'mqtt://localhost'; // Example URL, adjust for your broker
+const topic = 'mailbox/incoming'; // Topic for incoming mail notifications
+
+// MQTT client initialization
 const client = mqtt.connect(brokerUrl);
 
-// Event handler when client connects successfully
-client.on('connect', () => {
-    console.log('Connected to MQTT Broker');
-    client.subscribe(topic, (err) => {
-        if (err) {
-            console.error('Error subscribing to topic:', err);
-        }
-    });
-});
+// Function to handle incoming MQTT messages
+function handleMqttMessage(topic, message) {
+  debug(`Received message on topic "${topic}": ${message.toString()}`);
+  
+  if (topic === 'mailbox/incoming') {
+    try {
+      const notification = JSON.parse(message.toString());
+      const weight = notification.weight;
 
-// Event handler for incoming messages from MQTT Broker
-client.on('message', (topic, message) => {
-    // Parse message content to a weight value
-    const weight = parseFloat(message.toString());
-    if (!isNaN(weight)) {
+      if (!isNaN(weight)) {
         updateCurrentWeight(weight);
-    } else {
-        console.error('Invalid weight value:', message.toString());
+      } else {
+        console.error('Invalid weight value:', notification);
+      }
+    } catch (error) {
+      console.error('Error parsing notification:', error);
     }
-});
+  }
+}
 
 // Function to update the current weight
 function updateCurrentWeight(weight) {
-    currentWeight = weight;
-    updateMailCount();
-    checkMailboxFull();
-
-    // Send data to frontend
-    sendDataToFrontend();
+  currentWeight += weight;
+  updateMailCount();
+  checkMailboxFull();
+  sendDataToFrontend();
 }
 
 // Function to calculate the number of mail items
 function updateMailCount() {
-    mailCount = Math.floor(currentWeight / MAIL_WEIGHT);
+  mailCount = Math.floor(currentWeight / MAIL_WEIGHT);
 }
 
 // Function to check if the mailbox is full
 function checkMailboxFull() {
-    isMailboxFull = currentWeight >= MAX_WEIGHT;
+  isMailboxFull = currentWeight >= MAX_WEIGHT;
 }
 
 // Function to send data to the frontend
 function sendDataToFrontend() {
-    const data = {
-        currentWeight: currentWeight,
-        mailCount: mailCount,
-        isMailboxFull: isMailboxFull,
-    };
+  const data = {
+    currentWeight: currentWeight,
+    mailCount: mailCount,
+    isMailboxFull: isMailboxFull,
+  };
 
-    // Example: handler call (adjust to your frontend communication method)
-    frontendHandler(data);
+  // Example: handler call (adjust to your frontend communication method)
+  debug('Sending data to frontend:', data);
 }
 
-// Example handler function for frontend communication
-function frontendHandler(data) {
-    // Here you can implement a specific method to communicate with the frontend,
-    // such as WebSocket, HTTP, or another method.
-    console.log('Data sent to frontend:', data);
+// Main function to initialize the controller
+function initializeMailController() {
+  debug('Initializing Mail Controller...');
+  
+  // Initialize the MQTT connection
+  client.on('connect', () => {
+    debug('Connected to MQTT broker');
+    client.subscribe(topic, (err) => {
+      if (err) {
+        console.error('Error subscribing to topic:', err);
+      } else {
+        debug(`Subscribed to "${topic}"`);
+      }
+    });
+  });
+
+  // Set up the message handler
+  client.on('message', handleMqttMessage);
+
+  debug('Mail Controller initialized.');
 }
 
+module.exports = { initializeMailController };

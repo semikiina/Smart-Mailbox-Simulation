@@ -1,28 +1,20 @@
-const axios = require('axios');
+const mqtt = require('mqtt');
 
-const apiUrl = 'https://localhost:1080';  // TODO: Change this to the correct API URL
+// MQTT Broker configuration
+const brokerUrl = 'mqtt://localhost:1883'; // MQTT Broker URL
+const topic = 'mailbox/weight'; // Topic to publish weight data
 
+// Function to connect to MQTT Broker
+const client = mqtt.connect(brokerUrl);
 
+client.on('connect', () => {
+  console.log('Connected to MQTT broker');
+  startRandomNotifications();
+});
 
-// Send a request to the API
-const sendMailNotification = async () => {
-  try {
-    const response = await axios.post(apiUrl, {
-      weight: getRandomWeight(),
-      date : new Date().toISOString()
-    });
-    console.log('Notification sent: ', response.data);
-  } catch (error) {
-    console.error('Error sending notification:', error.message);
-  }
-};
-
-// Generate random time intervals between 1 and 5 minutes
-const getRandomInterval = () => {
-  const min = 1 * 60 * 1000; 
-  const max = 5 * 60 * 1000; 
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+client.on('error', (error) => {
+  console.error('MQTT connection error:', error.message);
+});
 
 // Generate random weight between 70 and 350 grams
 const getRandomWeight = () => {
@@ -31,11 +23,37 @@ const getRandomWeight = () => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+// Generate random time intervals between 5 and 10 seconds
+const getRandomInterval = () => {
+  const min = 5 * 1000; // 5 seconds
+  const max = 10 * 1000; // 10 seconds
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+// Send the random weight data to MQTT broker
+const sendMailNotification = async () => {
+  try {
+    const weight = getRandomWeight();
+    const data = { weight: weight, date: new Date().toISOString() };
+
+    // Publish data to MQTT topic
+    client.publish(topic, JSON.stringify(data), { qos: 2 }, (err) => {
+      if (err) {
+        console.error('Error publishing message:', err);
+      } else {
+        console.log(`Notification sent: Weight = ${weight} grams`);
+      }
+    });
+  } catch (error) {
+    console.error('Error sending notification:', error.message);
+  }
+};
+
 // Random notification process
 const startRandomNotifications = () => {
   const interval = getRandomInterval();
 
-  console.log(`Next mail notification will be sent in ${interval / 1000 / 60} minutes...`);
+  console.log(`Next mail notification will be sent in ${interval / 1000} seconds...`);
 
   setTimeout(async () => {
     await sendMailNotification();
@@ -47,5 +65,3 @@ const startRandomNotifications = () => {
 
 // Start the process
 startRandomNotifications();
-
-// module.exports = {getRandomInterval};
