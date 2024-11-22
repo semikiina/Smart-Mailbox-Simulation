@@ -4,11 +4,10 @@ const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://localhost');
 
 // Maximale Kapazität der Mailbox (in Gramm)
-const MAILBOX_CAPACITY = 5000; // Beispiel: 5kg
+const MAILBOX_CAPACITY = 1000; // Beispiel: 1kg
 
-// Aktuelle Mail-Daten (Größe in Gramm und Anzahl der Briefe)
+// Aktuelles Gesamtgewicht in der Mailbox
 let currentWeight = 0;
-let mailCount = 0;
 
 // Initialisierung des MailControllers
 const initializeMailController = () => {
@@ -29,9 +28,11 @@ const initializeMailController = () => {
       const payload = JSON.parse(message.toString());
       const { weight, timestamp } = payload;
 
-      // Aktualisiere das Gewicht und die Anzahl der Briefe
+      // Aktualisiere das Gewicht
       currentWeight += weight;
-      mailCount += 1;
+
+      // Berechne die Anzahl der Briefe basierend auf 20g pro Brief
+      const mailCount = Math.floor(currentWeight / 20);
 
       // Ausgabe im Terminal
       console.log(`Received new mail at ${timestamp}:`);

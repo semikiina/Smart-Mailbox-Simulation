@@ -3,8 +3,11 @@ const mqtt = require('mqtt');
 // Konfiguration des MQTT Brokers
 const client = mqtt.connect('mqtt://localhost'); // Der Broker läuft auf localhost
 
-// Funktion zur Erzeugung eines zufälligen Gewichts
-const getRandomWeight = (min = 70, max = 350) => {
+// Gewicht eines Briefes (in Gramm)
+const LETTER_WEIGHT = 20;
+
+// Funktion zur Erzeugung einer zufälligen Anzahl von Briefen
+const getRandomLetterCount = (min = 1, max = 10) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
@@ -15,10 +18,11 @@ const getRandomInterval = (min = 5000, max = 10000) => {
 
 // Funktion zur Veröffentlichung von Gewicht und Datum an MQTT
 const publishWeight = () => {
-  // Erzeuge zufälliges Gewicht und Datum
-  const weight = getRandomWeight();
+  // Erzeuge zufällige Anzahl von Briefen und berechne das Gesamtgewicht
+  const letterCount = getRandomLetterCount();
+  const weight = letterCount * LETTER_WEIGHT; // Gesamtgewicht der Briefe
   const timestamp = new Date().toISOString(); // Aktuelles Datum im ISO-Format
-  
+
   const payload = JSON.stringify({ weight, timestamp });
 
   // Veröffentliche das Gewicht auf dem Thema 'mailbox/weight'
@@ -42,4 +46,4 @@ client.on('error', (err) => {
   console.error('Error:', err);
 });
 
-module.exports = { getRandomWeight, getRandomInterval };
+module.exports = { getRandomLetterCount, getRandomInterval };
