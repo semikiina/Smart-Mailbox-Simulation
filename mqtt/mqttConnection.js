@@ -1,4 +1,5 @@
 const mqtt = require('mqtt');
+const { getRandomWeight, getRandomInterval } = require('../scripts/mailNotifier');
 
 async function initializeMqtt() {
   try {
@@ -15,41 +16,37 @@ async function initializeMqtt() {
     // Subscribe to topics
     await client.subscribeAsync('mailbox/incoming');
     console.log('Subscribed to "mailbox/incoming" topic');
-
     await client.subscribeAsync('mailbox/weight');
     console.log('Subscribed to "mailbox/weight" topic');
 
-    // Function to generate random weight between 0 and 99
-    const getRandomWeight = () => Math.floor(Math.random() * 100);
+    // Function to publish random weights with the current date and time
+    const startPublishingRandomData = () => {
+      const publishRandomData = () => {
+        const randomWeight = getRandomWeight(70, 350); // Generate weight between 70 and 350
+        const currentDateTime = new Date().toISOString(); // Get the current date and time
+        const data = {
+          weight: randomWeight,
+          date: currentDateTime,
+        };
 
-    // Generate random time intervals between 5 and 10 seconds
-    const getRandomInterval = () => {
-      const min = 5 * 1000; // 5 seconds
-      const max = 10 * 1000; // 10 seconds
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
+        client.publish('mailbox/weight', JSON.stringify(data), { qos: 2 }, (err) => {
+          if (err) {
+            console.error('Error publishing message:', err);
+          } else {
+            console.log(`Published data: ${JSON.stringify(data)}`);
+          }
+        });
 
-    // Function to publish random weights
-    const startPublishingRandomWeights = () => {
-      publishInterval = setInterval(() => {
-        const randomWeight = getRandomWeight(); // Generates a random weight between 0 and 99
-        client.publish('mailbox/weight', randomWeight.toString(), { qos: 2 });
-        console.log(`Published random weight: ${randomWeight} to "mailbox/weight" topic`);
-      }, getRandomInterval()); // Use random interval between 5 and 10 seconds
-    };
+        const nextInterval = getRandomInterval(5000, 10000); // Random interval between 5-10 seconds
+        console.log(`Next publish in ${nextInterval / 1000} seconds`);
+        setTimeout(publishRandomData, nextInterval); // Schedule next publish
+      };
 
-    const stopPublishingRandomWeights = () => {
-      clearInterval(publishInterval);
-      console.log('Stopped publishing random weights.');
+      publishRandomData(); // Start the first publish
     };
 
     // Start publishing
-    startPublishingRandomWeights();
-
-    // Stop the publishing loop after timeout
-    setTimeout(() => {
-      stopPublishingRandomWeights();
-    }, 120000); // Stops after 120 seconds to stop for testing, adjust as needed
+    startPublishingRandomData();
 
     // Handle cleanup on client error
     client.on('error', (error) => {
@@ -64,3 +61,4 @@ async function initializeMqtt() {
 }
 
 module.exports = { initializeMqtt };
+
