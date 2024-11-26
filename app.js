@@ -13,11 +13,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialisierungen
-initializeMqtt(); // MQTT-Verbindung initialisieren
-initializeMailController(); // Mail Controller starten
 
 app.listen(1080, () => {
-  connectDatabase().catch(console.error);
+  connectDatabase().then(() => {
+    console.log('Connected to MongoDB');
+    // Initialisierungen
+    initializeMqtt(); // MQTT-Verbindung initialisieren
+    initializeMailController(); // Mail Controller starten
+
+  }
+  ).catch((err) => {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1);
+  });
   console.log('Server is running on http://localhost:1080');
 });
