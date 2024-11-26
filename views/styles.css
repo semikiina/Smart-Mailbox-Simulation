@@ -113,17 +113,16 @@ body {
     font-weight: bold;
     font-size: 1.2em;
 }
-/* Neue Mail Text */
 .new-mail {
     font-size: 1em;
-    color: #f39c12; /* Gelb, um hervorzuheben */
+    color: #f39c12;
     font-weight: bold;
-    margin-bottom: 5px; /* Platz zwischen Text und anderen Elementen */
-    display: block; /* Damit der Text unter den anderen Elementen erscheint */
-    text-align: center; /* Optional: Text zentrieren */
-    z-index: 10; /* Sicherstellen, dass der Text über anderen Elementen liegt */
-    background-color: rgba(0, 0, 0, 0.1); /* Leichter Hintergrund, um Text sichtbar zu machen */
+    margin-bottom: 5px;
+    display: block;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
     padding: 3px;
+    z-index: 10;
 }
 
 /* Stil für die Mail-Liste */
