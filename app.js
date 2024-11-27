@@ -23,18 +23,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API endpoint to get mailbox data
-app.get('/mailbox', (req, res) => {
-  res.json(mailboxData); // Send mailbox data as JSON response
-});
 
-// Initialize MQTT connection and Mail Controller
-initializeMqtt(); // Initialize MQTT connection
-initializeMailController(mailboxData); // Start Mail Controller and pass mailboxData
-
-// Start the server on port 1080
 app.listen(1080, () => {
-  // Connect to the database and handle errors
-  connectDatabase().catch(console.error);
-  console.log('Server is running on http://localhost:1080'); // Log server status
+  connectDatabase().then(() => {
+    console.log('Connected to MongoDB');
+    // Initialisierungen
+    initializeMqtt(); // MQTT-Verbindung initialisieren
+    initializeMailController(); // Mail Controller starten
+
+  }
+  ).catch((err) => {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1);
+  });
+  console.log('Server is running on http://localhost:1080');
 });

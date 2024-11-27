@@ -1,6 +1,7 @@
 const mqtt = require('mqtt');
 const http = require('http');
 let isMailboxFull = false;
+const Mailbox = require('../models/Mailbox');
 
 // Connect to the MQTT broker
 const client = mqtt.connect('mqtt://localhost');
@@ -40,7 +41,7 @@ const initializeMailController = () => {
     }
   });
 
-  client.on('message', (topic, message) => {
+  client.on('message', async (topic, message) => {
     if (topic === 'mailbox/weight') {
       // Parse the incoming message
       const payload = JSON.parse(message.toString());
@@ -69,6 +70,19 @@ const initializeMailController = () => {
       console.log(`  - Total number of letters: ${mailCount}`);
       console.log(`  - Total weight in mailbox: ${currentWeight} grams`);
 
+      // Save to the database
+      const mailEntry = new Mailbox({
+        weight,
+        timestamp: new Date(timestamp),
+        totalWeight: currentWeight,
+        mailCount,
+      });
+
+      await mailEntry.save();
+      console.log('Mail entry saved to the database.');
+
+
+
       // Check if the mailbox is full
       if (currentWeight >= MAILBOX_CAPACITY) {
         console.log('Mailbox is now full!');
@@ -82,6 +96,9 @@ const initializeMailController = () => {
         }), { qos: 1 });
       }
     }
+
+    console.log("-----------------------------");
+    console.log("");
   });
 }
 
