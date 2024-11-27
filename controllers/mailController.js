@@ -47,10 +47,10 @@ const initializeMailController = () => {
       const payload = JSON.parse(message.toString());
       const { weight, timestamp } = payload;
 
-      // If mailbox is full, ignore new messages
+      // Check if the mailbox is full before processing the new mail
       if (isMailboxFull) {
-        console.log('Mailbox is full! Ignoring new messages.');
-        return; // Exit early to ignore new messages
+        console.log('Mailbox is full, ignoring new mail data.');
+        return; // Ignore the new mail data if the mailbox is full
       }
 
       // Add the new mail to the receivedMails array
@@ -79,9 +79,7 @@ const initializeMailController = () => {
       });
 
       await mailEntry.save();
-      console.log('Mail entry saved to the database.');
-
-
+      console.log('Mail entry saved to database.');
 
       // Check if the mailbox is full
       if (currentWeight >= MAILBOX_CAPACITY) {
@@ -90,7 +88,7 @@ const initializeMailController = () => {
 
         // Publish a notification to "mailbox/full" topic
         client.publish('mailbox/full', JSON.stringify({
-          message: 'Mailbox is full',
+          message: 'Mailbox is full, please empty it',
           currentWeight,
           timestamp: new Date().toISOString(),
         }), { qos: 1 });

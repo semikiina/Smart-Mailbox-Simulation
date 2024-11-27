@@ -30,7 +30,6 @@ app.listen(1080, () => {
     // Initialisierungen
     initializeMqtt(); // MQTT-Verbindung initialisieren
     initializeMailController(); // Mail Controller starten
-
   }
   ).catch((err) => {
     console.error('Failed to connect to MongoDB:', err);
