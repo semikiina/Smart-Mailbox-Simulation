@@ -1,4 +1,4 @@
-const mqtt = require('mqtt');
+/*const mqtt = require('mqtt');
 
 (async () => {
   let client;
@@ -47,4 +47,4 @@ const mqtt = require('mqtt');
   console.error('An error occurred!');
   console.error(error);
   process.exit(1);
-});
+});*/
