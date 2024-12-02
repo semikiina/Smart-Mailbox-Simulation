@@ -1,6 +1,16 @@
 # IOT PROJECT - Smart Mailbox WebApp
 
-// TODO
+## To start the program
+
+```
+Open two terminals
+
+- First terminal (Start the scripter)
+   - cd scripts
+   - node mailNotifier.js
+- Second terminal (Start the server)
+   - node app.js
+```
 
 ## Features
 
