@@ -1,10 +1,10 @@
-const mqtt = require('mqtt');
+const { initializeMqtt } = require('../mqtt/mqttConnection');
 const http = require('http');
 let isMailboxFull = false;
 const Mailbox = require('../models/Mailbox');
 
-// Connect to the MQTT broker
-const client = mqtt.connect('mqtt://localhost');
+// Hole die zentrale MQTT-Verbindung
+const client = initializeMqtt();
 
 // Maximum capacity of the mailbox (in grams)
 const MAILBOX_CAPACITY = 2000; // Example: 2kg
@@ -15,7 +15,7 @@ let currentWeight = 0;
 // List of received mails (with weight and timestamp)
 const receivedMails = [];
 
-// Function to format a date 
+// Function to format a date
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleString({
@@ -32,6 +32,9 @@ const formatDate = (timestamp) => {
 const initializeMailController = () => {
   console.log('Mail Controller initialized and listening to MQTT messages');
 
+  // Verhindere doppelte Event-Handler
+  client.removeAllListeners('message');
+
   // Subscribe to the 'mailbox/weight' topic
   client.subscribe('mailbox/weight', (err) => {
     if (err) {
@@ -41,6 +44,7 @@ const initializeMailController = () => {
     }
   });
 
+  // Message handler for processing incoming MQTT messages
   client.on('message', async (topic, message) => {
     if (topic === 'mailbox/weight') {
       // Parse the incoming message
@@ -98,15 +102,16 @@ const initializeMailController = () => {
     console.log("-----------------------------");
     console.log("");
   });
-}
+};
 
+// Function to empty the mailbox
 const emptyMailbox = () => {
-  // Setze alle Mailbox-Daten zurück
+  // Reset all mailbox data
   currentWeight = 0;
-  receivedMails.length = 0; // Lösche die Liste der empfangenen Mails
-  isMailboxFull = false; // Markiere die Mailbox als nicht voll
+  receivedMails.length = 0; // Clear the list of received mails
+  isMailboxFull = false; // Mark the mailbox as not full
 
-  // Rückgabe der zurückgesetzten Mailbox-Daten
+  // Return the reset mailbox data
   return {
     currentWeight,
     mailCount: Math.floor(currentWeight / 20),
@@ -114,12 +119,6 @@ const emptyMailbox = () => {
     receivedMails,
   };
 };
-
-
-// Error handling for the MQTT client
-client.on('error', (err) => {
-  console.error('MQTT client error:', err);
-});
 
 // HTTP Server to provide mailbox data
 const server = http.createServer((req, res) => {
@@ -152,10 +151,10 @@ const server = http.createServer((req, res) => {
   }
   // Route for emptying the mailbox
   else if (req.method === 'POST' && req.url === '/empty-mailbox') {
-    // Leere die Mailbox
+    // Empty the mailbox
     const updatedMailboxData = emptyMailbox();
 
-    // Gebe den Status der leeren Mailbox als Antwort zurück
+    // Return the status of the emptied mailbox
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(updatedMailboxData));
   }
@@ -171,9 +170,6 @@ const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`HTTP server is running on http://localhost:${PORT}`);
 });
-
-// Start the MailController
-initializeMailController();
 
 // Export the MailController initialization function for reuse
 module.exports = { initializeMailController };
