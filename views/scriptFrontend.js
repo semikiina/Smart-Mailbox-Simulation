@@ -7,6 +7,7 @@ async function fetchMailboxData() {
         }
 
         const data = await response.json();
+        console.log('Data received from API:', data);
 
         // Mailbox-Status aktualisieren
         const infoDiv = document.getElementById('mailbox-info');
