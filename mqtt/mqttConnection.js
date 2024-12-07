@@ -1,11 +1,10 @@
 const mqtt = require('mqtt');
 
-// Initialize MQTT connection only once
 let client;
 
 function initializeMqtt() {
     if (!client) {
-        // Erstelle nur eine Verbindung
+
         client = mqtt.connect('mqtt://localhost:1883');
 
         // Event listener for successful connection to the MQTT broker
@@ -22,5 +21,5 @@ function initializeMqtt() {
     return client;
 }
 
-// Export the client object and the initialization function
+
 module.exports = { initializeMqtt };

@@ -2,23 +2,18 @@ const { initializeMqtt } = require('../mqtt/mqttConnection');
 const http = require('http');
 const Mailbox = require('../models/Mailbox');
 
-// Hole die zentrale MQTT-Verbindung
+
 const client = initializeMqtt();
 
-// Maximales Gewicht der Mailbox (in Gramm)
-const MAILBOX_CAPACITY = 2000; // Beispiel: 2kg
+const MAILBOX_CAPACITY = 2000;
 
-// Aktuelles Gesamtgewicht in der Mailbox
 let currentWeight = 0;
 
-// Liste der empfangenen Briefe (mit Gewicht und Zeitstempel)
 const receivedMails = [];
 
-// Statusvariablen
 let isMailboxFull = false;
-let isResetting = false; // Verhindert gleichzeitige Reset-Vorgänge
+let isResetting = false;
 
-// Funktion zur Formatierung von Datum
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleString({
@@ -31,14 +26,13 @@ const formatDate = (timestamp) => {
   });
 };
 
-// MailController initialisieren
+
 const initializeMailController = () => {
   console.log('Mail Controller initialized and listening to MQTT messages');
 
-  // Doppelte Event-Handler verhindern
   client.removeAllListeners('message');
 
-  // Abonniere das 'mailbox/weight'-Thema
+  //subscribing
   client.subscribe('mailbox/weight', (err) => {
     if (err) {
       console.error('Subscription error:', err);
@@ -47,9 +41,9 @@ const initializeMailController = () => {
     }
   });
 
-  // Message-Handler für eingehende MQTT-Nachrichten
+
   client.on('message', async (topic, message) => {
-    if (isResetting) return; // Blockiere neue Nachrichten während des Resets
+    if (isResetting) return;
 
     if (topic === 'mailbox/weight') {
       const payload = JSON.parse(message.toString());
@@ -60,7 +54,6 @@ const initializeMailController = () => {
         return;
       }
 
-      // Füge neuen Brief zur Liste hinzu
       receivedMails.push({
         weight,
         timestamp: formatDate(timestamp),
@@ -74,7 +67,7 @@ const initializeMailController = () => {
       console.log(`  - Total number of letters: ${mailCount}`);
       console.log(`  - Total weight in mailbox: ${currentWeight} grams`);
 
-      // Speichere in der Datenbank
+
       const mailEntry = new Mailbox({
         weight,
         timestamp: new Date(timestamp),
@@ -88,7 +81,6 @@ const initializeMailController = () => {
         console.error('Error saving mail entry:', error);
       });
 
-      // Überprüfe, ob die Mailbox voll ist
       if (currentWeight >= MAILBOX_CAPACITY) {
         console.log('Mailbox is now full!');
         isMailboxFull = true;
@@ -103,9 +95,8 @@ const initializeMailController = () => {
   });
 };
 
-// Funktion zum Leeren der Mailbox
 const emptyMailbox = () => {
-  if (isResetting) return; // Verhindere mehrfaches Zurücksetzen
+  if (isResetting) return;
 
   console.log('Emptying mailbox...');
   isResetting = true;
@@ -114,7 +105,7 @@ const emptyMailbox = () => {
   receivedMails.length = 0;
   isMailboxFull = false;
 
-  // Benachrichtigung über geleerte Mailbox senden
+
   client.publish('mailbox/cleared', JSON.stringify({
     message: 'Mailbox has been emptied',
     timestamp: new Date().toISOString(),
@@ -122,7 +113,7 @@ const emptyMailbox = () => {
 
   setTimeout(() => {
     isResetting = false;
-  }, 500); // Blockiere kurzzeitig neue Operationen
+  }, 500);
 
   return {
     currentWeight,
@@ -132,7 +123,7 @@ const emptyMailbox = () => {
   };
 };
 
-// HTTP-Server für Mailbox-Daten
+// HTTP-Server for mailbox data
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -170,11 +161,11 @@ const server = http.createServer((req, res) => {
   }
 });
 
-// HTTP-Server starten
+// start HTTP-Server
 const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`HTTP server is running on http://localhost:${PORT}`);
 });
 
-// MailController exportieren
+
 module.exports = { initializeMailController };
