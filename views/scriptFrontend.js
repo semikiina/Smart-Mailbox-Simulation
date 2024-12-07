@@ -39,15 +39,15 @@ async function fetchMailboxData() {
         const fillPercentage = Math.min((data.currentWeight / maxWeight) * 100, 100); // Begrenzung auf 100%
         fillLevel.style.height = `${fillPercentage}%`; // Höhe basierend auf dem Prozentsatz setzen
 
-        // Wenn die Mailbox voll ist, Benachrichtigung anzeigen
+
         if (data.isFull) {
-            // Eine neue Benachrichtigung erstellen
+
             const newNotification = {
                 id: new Date().toISOString(),
                 text: '🚨 Mailbox is full, please empty it! 🚨',
             };
 
-            // Benachrichtigung in die Mail-Liste einfügen
+
             addNotification(newNotification);
         }
     } catch (error) {
