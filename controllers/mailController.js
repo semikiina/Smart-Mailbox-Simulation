@@ -6,6 +6,9 @@ const Mailbox = require('../models/Mailbox');
 // Connect to the MQTT broker
 const client = mqtt.connect('mqtt://localhost');
 
+// Schutzvariable: Initialisierung verhindern
+let isInitialized = false;
+
 // Maximum capacity of the mailbox (in grams)
 const MAILBOX_CAPACITY = 2000; // Example: 2kg
 
@@ -15,7 +18,7 @@ let currentWeight = 0;
 // List of received mails (with weight and timestamp)
 const receivedMails = [];
 
-// Function to format a date 
+// Function to format a date
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleString({
@@ -30,7 +33,16 @@ const formatDate = (timestamp) => {
 
 // Initialize the MailController
 const initializeMailController = () => {
+  if (isInitialized) {
+    console.log('Mail Controller already initialized. Skipping...');
+    return; // Verhindere doppelte Initialisierung
+  }
+  isInitialized = true;
+
   console.log('Mail Controller initialized and listening to MQTT messages');
+
+  // Remove any previously registered handlers to prevent duplicates
+  client.removeAllListeners('message');
 
   // Subscribe to the 'mailbox/weight' topic
   client.subscribe('mailbox/weight', (err) => {
@@ -98,7 +110,7 @@ const initializeMailController = () => {
     console.log("-----------------------------");
     console.log("");
   });
-}
+};
 
 const emptyMailbox = () => {
   // Reset all mailbox data
@@ -114,7 +126,6 @@ const emptyMailbox = () => {
     receivedMails,
   };
 };
-
 
 // Error handling for the MQTT client
 client.on('error', (err) => {
